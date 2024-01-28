@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Page</title>
+    <link rel="stylesheet" href="design.css">
+    <style>
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body class="background">
+    <div class="search-container">
+        <img class="logo" src="logo.png" alt="Logo">
+        <div class="search-bar-container">
+            <input type="text" id="urlInput" class="search-bar">
+            <button id="clearButton" style="display: none;">X</button>
+        </div>
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <span>Choisissez un autre domaine.</span>
+        </div>
+        <div class="search-buttons">
+            <button onclick="scanSite()">Scan Me!</button>
+        </div>
+    </div>
+    <div id="scanResult"></div>
+    <script>
+        function scanSite() {
+            const url = document.getElementById('urlInput').value;
+            if (!isValidUrl(url)) {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('clearButton').style.display = 'inline-block';
+                return;
+            }
+            fetch(/scan?url=${encodeURIComponent(url)}, {
+                method: 'GET'
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('scanResult').innerText = data;
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('clearButton').style.display = 'none';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+            } catch (_) {
+                return false;
+            }
+            return true;
+        }
+
+        function clearInput() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('clearButton').style.display = 'none';
+        }
+        
+        document.getElementById('clearButton').addEventListener('click', clearInput);
+    </script>
+</body>
+</html>
